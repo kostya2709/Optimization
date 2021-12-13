@@ -18,7 +18,6 @@ class camns_audio(camns_object):
             self.vector__, self.sr = sf.read(file)
             self.vector__ = self.vector__[:camns_audio.MAX_SIZE, :1].reshape(-1,)
             self.size__ = self.vector__[0]
-            print(self.vector__.shape)
             self.has_audio__ = True
         else:
             self.has_audio__ = False
@@ -31,7 +30,7 @@ class camns_audio(camns_object):
         file = pathlib.Path(__file__).parent.parent.resolve() / 'res' / name
         sf.write(str(file), self.vector__, self.sr)
 
-    def set_sounds(self, sounds=np.ndarray, size=None):
+    def set_sounds(self, sounds):
 
         self.vector__ = np.array(list(sounds))
         self.has_audio__ = True
@@ -40,12 +39,17 @@ class camns_audio(camns_object):
 
     @staticmethod
     def mix(audio, observ_num=None):
-        print(len(audio))
         sounds = camns_audio.to_audio_matrix(audio)
-        print(sounds.shape)
         res = get_random_observations(sounds, observ_num)
         mixed = camns_audio.from_audio_matrix(res, audio[0].sr)
         return mixed
+
+    @staticmethod
+    def camns_lp(audio, observ_num=None):
+        sounds = camns_audio.to_audio_matrix(audio)
+        res = camns_lp(sounds, observ_num)
+        unmixed = camns_audio.from_audio_matrix(res, audio[0].sr)
+        return unmixed
 
     @staticmethod
     def to_audio_matrix(audio):
@@ -56,7 +60,7 @@ class camns_audio(camns_object):
         return np.array(list(map(lambda x: x.vector__, audio))).T
 
     @staticmethod
-    def from_audio_matrix(audio, sr = 1):
+    def from_audio_matrix(audio, sr = 48000):
         """
         input: (L, M) - L - sound size, M - number of sounds
         audio = [sound1, sound2, ...]

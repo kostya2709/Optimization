@@ -23,10 +23,10 @@ def get_random_observations(sources, observ_num=None):
     if observ_num is None:
         observ_num = sources_num
 
-    random_matrix = stats.norm.rvs(loc = 1, size=(sources_num, observ_num))
+    random_matrix = np.random.rand(observ_num, sources_num)
     column_sum = np.sum(random_matrix, axis=1, keepdims=True)
     random_matrix /= column_sum
-    return sources @ random_matrix
+    return sources @ random_matrix.T
 
 def is_extreme_point(C, d, alpha, tol):
     vec = C @ alpha + d
@@ -65,13 +65,11 @@ def camns_lp(observs, sources_num=None):
     S = np.zeros((L, N))
     lp_cnt = 0
     E_L = np.eye(L)
-    Q_T = Q1.reshape((1, -1))
-    pros = Q1.dot(Q_T)
     while el < N:
         B = E_L - Q1 @ Q1.T
         w = stats.norm.rvs(size=L)
         r = B @ w
-        c = matrix(-C.T.dot(r))
+        c = matrix(-C.T @ r)
         A_ub = matrix(-C)
         b_ub = matrix(d)
 

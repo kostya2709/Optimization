@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def plot_images(imgs, rows, columns):
     # create figure
-    fig = plt.figure(figsize=(10, 7))
+    fig = plt.figure(figsize=(20, 12))
 
     for i in range(len(imgs)):
         # Adds a subplot at the 1st position
@@ -81,7 +81,7 @@ class camns_image(camns_object):
     def camns_lp(imgs, observ_num=None):
         pixels = camns_image.to_imgs_matrix(imgs)
         res = camns_lp(pixels, observ_num)
-        unmixed = camns_image.from_imgs_matrix(res)
+        unmixed = camns_image.from_imgs_matrix(res, imgs[0].channel_num__)
         return unmixed
 
     def __init__(self, file: str=None, folder=None, channel_num=1):
@@ -105,6 +105,7 @@ class camns_image(camns_object):
     def set_pixels(self, pixels=np.ndarray, size=None):
 
         self.image_matrix__ = camns_image.tomatrix(pixels, self.channel_num__, size) * 255
+        self.image_matrix__ = self.image_matrix__.astype(np.uint8)
         self.vector__ = pixels
         self.has_image__ = True
 
